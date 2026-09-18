@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { initializeApp } from 'firebase/app'
 import {
   getAuth,
   onAuthStateChanged,
@@ -10,9 +9,8 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
 } from 'firebase/auth'
-import { firebaseConfig } from '../firebase'
+import { app } from '../firebase'
 
-const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 
 const AdminContext = createContext(null)

@@ -1,17 +1,32 @@
 // ---------------------------------------------------------------------------
-// Gallery image store — LOCAL UPLOADS ONLY
+// Gallery image store — LOCAL UPLOADS ONLY, synced via Firebase Firestore
 // ---------------------------------------------------------------------------
-// There are no default/remote/random images any more. Every photo in the
-// gallery is uploaded from the admin's own computer via the /admin page and
-// stored in the browser's localStorage as a compressed data URL.
+// Every photo is uploaded from the admin's own computer via the /admin page.
+// It is compressed in the browser, then saved as a Firestore document (the
+// compressed image is stored as a base64 string field on the document).
+// Because it lives in Firestore rather than localStorage, every visitor on
+// every device sees the same photos — not just the device that uploaded them.
 //
-// Visitors can only view. Add / delete happens on the Admin page.
-// To move to a real backend later, swap the four functions marked [STORE]
-// for API calls — the rest of the app does not need to change.
+// Visitors can only view (Firestore rules: read: true). Add / delete only
+// works for a logged-in admin (Firestore rules: write requires auth).
 // ---------------------------------------------------------------------------
 
-const STORAGE_KEY = 'sumenar_gallery_images'
-const CHANGE_EVENT = 'sumenar-gallery-changed'
+import { app } from '../firebase'
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  getDocs,
+  Timestamp,
+} from 'firebase/firestore'
+
+export const db = getFirestore(app)
+const COLLECTION_NAME = 'galleryImages'
 
 /** Categories offered in the upload form and used as gallery filters. */
 export const GALLERY_CATEGORIES = [
@@ -25,73 +40,58 @@ export const GALLERY_CATEGORIES = [
 /** Kept for backwards compatibility — intentionally empty (no seeded photos). */
 export const DEFAULT_GALLERY_IMAGES = []
 
-/** Max pixel size + JPEG quality used when compressing an uploaded file. */
-const MAX_DIMENSION = 1600
-const JPEG_QUALITY = 0.82
+// Firestore caps a single document around 1 MB. Base64 text is ~33% bigger
+// than the original binary, so we compress fairly aggressively and leave
+// headroom below that cap.
+const MAX_DIMENSION = 1200
+const JPEG_QUALITY = 0.75
+const MAX_DATA_URL_BYTES = 900 * 1024
 
-// --- [STORE] read ----------------------------------------------------------
-export function loadGalleryImages() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    const parsed = raw ? JSON.parse(raw) : []
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-// --- [STORE] write ---------------------------------------------------------
-function persist(images) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(images))
-  } catch (err) {
-    // localStorage is usually capped around 5 MB per site.
-    throw new Error(
-      'Storage full. Delete a few older photos before uploading new ones.'
-    )
-  }
-  window.dispatchEvent(new Event(CHANGE_EVENT))
-  return images
-}
-
-// --- [STORE] add -----------------------------------------------------------
-export function addGalleryImage({ src, category, caption }) {
-  const image = {
-    id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    src,
-    category: category || GALLERY_CATEGORIES[0],
-    caption: (caption || '').trim() || 'Sumenar Engineering equipment',
-    uploadedAt: new Date().toISOString(),
-  }
-  const next = [image, ...loadGalleryImages()]
-  persist(next)
-  return image
-}
-
-// --- [STORE] delete --------------------------------------------------------
-export function deleteGalleryImage(id) {
-  const next = loadGalleryImages().filter((img) => img.id !== id)
-  persist(next)
-  return next
+// --- read (one-time fetch, rarely needed since subscribeGallery covers live use) ---
+export async function loadGalleryImages() {
+  const q = query(collection(db, COLLECTION_NAME), orderBy('uploadedAt', 'desc'))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
 }
 
 /**
- * Subscribe to gallery changes (same tab + other tabs).
+ * Subscribe to gallery changes in real time — fires immediately with the
+ * current photos, then again whenever any device adds/removes one.
  * Returns an unsubscribe function.
  */
 export function subscribeGallery(callback) {
-  const handler = () => callback(loadGalleryImages())
-  window.addEventListener(CHANGE_EVENT, handler)
-  window.addEventListener('storage', handler)
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, handler)
-    window.removeEventListener('storage', handler)
+  const q = query(collection(db, COLLECTION_NAME), orderBy('uploadedAt', 'desc'))
+  return onSnapshot(
+    q,
+    (snap) => callback(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    (err) => console.error('Gallery sync error:', err)
+  )
+}
+
+// --- add (admin only — enforced by Firestore rules) -------------------------
+export async function addGalleryImage({ src, category, caption }) {
+  if (src.length > MAX_DATA_URL_BYTES) {
+    throw new Error(
+      'This image is still too large after compression. Please choose a smaller photo.'
+    )
   }
+  const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+    src,
+    category: category || GALLERY_CATEGORIES[0],
+    caption: (caption || '').trim() || 'Sumenar Engineering equipment',
+    uploadedAt: Timestamp.now(),
+  })
+  return { id: docRef.id }
+}
+
+// --- delete (admin only — enforced by Firestore rules) ----------------------
+export async function deleteGalleryImage(id) {
+  await deleteDoc(doc(db, COLLECTION_NAME, id))
 }
 
 /**
  * Read a File picked from the local system and return a compressed data URL.
- * Downscaling keeps localStorage from filling up after a handful of photos.
+ * Downscaling keeps each Firestore document comfortably under its size cap.
  */
 export function fileToCompressedDataURL(file) {
   return new Promise((resolve, reject) => {

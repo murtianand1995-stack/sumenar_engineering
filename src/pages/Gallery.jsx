@@ -3,13 +3,13 @@ import { ImageOff, Images } from 'lucide-react'
 import SEO from '../components/SEO'
 import Lightbox from '../components/Lightbox'
 import Carousel from '../components/Carousel'
-import { loadGalleryImages, subscribeGallery } from '../data/galleryImages'
+import { subscribeGallery } from '../data/galleryImages'
 
 // This page is view-only. Photos are uploaded and removed by an admin on
 // the /admin page; visitors can only browse them.
 
 export default function Gallery() {
-  const [images, setImages] = useState(() => loadGalleryImages())
+  const [images, setImages] = useState([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [lightboxIndex, setLightboxIndex] = useState(null)
 

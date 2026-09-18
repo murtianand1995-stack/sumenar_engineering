@@ -34,7 +34,7 @@ export default function Admin() {
         <div className="container-x relative py-14 sm:py-16">
           <span className="eyebrow">Sumenar Engineering</span>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
-            <h1 className="text-3xl font-bold sm:text-4xl">Admin Panel</h1>
+            <h1 className="text-3xl font-bold sm:text-4xl">Gallery Admin</h1>
             {isAdmin && (
               <button type="button" onClick={logout} className="btn-secondary w-fit">
                 <LogOut size={16} /> Log out
@@ -261,7 +261,7 @@ function ChangePasswordForm({ onDone }) {
 // ---------------------------------------------------------------------------
 
 function ManagePhotos() {
-  const [images, setImages] = useState(() => loadGalleryImages())
+  const [images, setImages] = useState([])
   const [category, setCategory] = useState(GALLERY_CATEGORIES[0])
   const [caption, setCaption] = useState('')
   const [file, setFile] = useState(null)
@@ -293,7 +293,7 @@ function ManagePhotos() {
     setBusy(true)
     try {
       const src = await fileToCompressedDataURL(file)
-      addGalleryImage({ src, category, caption })
+      await addGalleryImage({ src, category, caption })
       setFile(null)
       setCaption('')
       e.target.reset()
@@ -305,10 +305,16 @@ function ManagePhotos() {
     }
   }
 
-  const handleDelete = () => {
-    deleteGalleryImage(confirmId)
-    setConfirmId(null)
-    setMessage('Photo removed.')
+  const handleDelete = async () => {
+    setError('')
+    try {
+      await deleteGalleryImage(confirmId)
+      setMessage('Photo removed.')
+    } catch (err) {
+      setError(err.message || 'Delete failed. Please try again.')
+    } finally {
+      setConfirmId(null)
+    }
   }
 
   return (
