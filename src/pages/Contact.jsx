@@ -53,7 +53,7 @@ export default function Contact() {
           <span className="eyebrow">Get In Touch</span>
           <h1 className="mt-3 max-w-2xl text-4xl font-bold sm:text-5xl">Let&rsquo;s talk about your lifting or separation need.</h1>
           <p className="mt-5 max-w-xl text-base text-metal-300">
-            Send us your requirement and our engineering team will get back to you with the
+            Send us your requirement & our engineering team will get back to you with the
             right solution and a quote.
           </p>
         </div>
