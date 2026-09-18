@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-body text-navy-900 antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  @apply font-display;
+  letter-spacing: 0.01em;
+}
+
+.font-display {
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background: #D8562A;
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid #D8562A;
+  outline-offset: 3px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #E4E8EE;
+}
+::-webkit-scrollbar-thumb {
+  background: #7E8A99;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.container-x {
+  @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm bg-forge-500 px-6 py-3 font-body text-sm font-semibold text-white shadow-panel transition-colors duration-200 hover:bg-forge-600 focus-visible:bg-forge-600 active:bg-forge-600 border border-forge-500 hover:border-forge-600;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm bg-transparent px-6 py-3 font-body text-sm font-semibold text-white border border-white/60 transition-colors duration-200 hover:bg-white hover:text-navy-900 focus-visible:bg-white focus-visible:text-navy-900;
+}
+
+.btn-outline-dark {
+  @apply inline-flex items-center justify-center gap-2 rounded-sm bg-transparent px-6 py-3 font-body text-sm font-semibold text-navy-900 border border-navy-900/30 transition-colors duration-200 hover:bg-navy-900 hover:text-white focus-visible:bg-navy-900 focus-visible:text-white;
+}
+
+.section-pad {
+  @apply py-16 sm:py-20 lg:py-28;
+}
+
+.eyebrow {
+  @apply text-xs font-semibold tracking-wide text-forge-500;
+}
+
+.diagonal-cut {
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 0 100%);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
