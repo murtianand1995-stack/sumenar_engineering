@@ -47,21 +47,23 @@ export default function Contact() {
 
     setSending(true)
     try {
-      // 1) Email — sent for real via EmailJS, lands directly in the inbox.
-      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          {
-            from_name: form.name,
-            from_email: form.email,
-            phone: form.phone,
-            company: form.company || '—',
-            message: form.message,
-          },
-          { publicKey: EMAILJS_PUBLIC_KEY }
-        )
+      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+        throw new Error('Email service is not configured yet.')
       }
+
+      // Email — sent for real via EmailJS, lands directly in the inbox.
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          phone: form.phone,
+          company: form.company || '—',
+          message: form.message,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      )
 
       setSubmitted(true)
       setForm(initialForm)
