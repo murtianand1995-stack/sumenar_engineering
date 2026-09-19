@@ -3,10 +3,12 @@ import { ShieldCheck, Repeat, Zap, HardHat, Settings2, Headphones } from 'lucide
 import SEO from '../components/SEO'
 import { WHY_CHOOSE_US, PROCESS_STEPS } from '../data/catalog'
 import { COMPANY } from '../data/siteData'
+import { useSiteImages } from '../data/siteImages'
 
 const ICONS = [ShieldCheck, Repeat, Zap, HardHat, Settings2, Headphones]
 
 export default function About() {
+  const siteImages = useSiteImages()
   return (
     <>
       <SEO
@@ -48,8 +50,8 @@ export default function About() {
             </p>
           </div>
           <div className="order-1 grid grid-cols-2 gap-4 lg:order-2">
-            <img src="https://picsum.photos/seed/sumenar-about-1/500/650" alt="Engineer inspecting a magnetic lifter component" className="h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
-            <img src="https://picsum.photos/seed/sumenar-about-2/500/650" alt="Sumenar Engineering fabrication floor" className="mt-10 h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
+            <img src={siteImages['about-1']} alt="Engineer inspecting a magnetic lifter component" className="h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
+            <img src={siteImages['about-2']} alt="Sumenar Engineering fabrication floor" className="mt-10 h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
           </div>
         </div>
       </section>

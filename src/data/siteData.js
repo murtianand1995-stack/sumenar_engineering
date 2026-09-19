@@ -1,8 +1,8 @@
 export const COMPANY = {
   name: 'Sumenar Engineering',
   tagline: 'Magnetic Solutions',
-  email: 'info@sumenarengineering.com', // [YOUR EMAIL] — replace with real inbox
-  phone: '+91 98765 43210', // [YOUR PHONE NUMBER] — replace with real number
+  email: 'murtianand1995@gmail.com',
+  phone: '+91 70701 00897',
   address: 'Plot No. 24, MIDC Industrial Area, Pune, Maharashtra, India', // [YOUR COMPANY ADDRESS]
 }
 

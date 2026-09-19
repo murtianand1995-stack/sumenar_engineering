@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Lock, LogOut, Upload, Trash2, ImageOff, ShieldCheck, KeyRound, Mail } from 'lucide-react'
+import { Lock, LogOut, Upload, Trash2, ImageOff, ShieldCheck, KeyRound, Mail, RotateCcw, Image as ImageIcon } from 'lucide-react'
 import SEO from '../components/SEO'
 import { useAdmin } from '../context/AdminContext'
 import {
@@ -10,6 +10,7 @@ import {
   subscribeGallery,
   fileToCompressedDataURL,
 } from '../data/galleryImages'
+import { SITE_IMAGE_SLOTS, useSiteImages, setSiteImage, resetSiteImage } from '../data/siteImages'
 
 export default function Admin() {
   const { isAdmin, checkingAuth, logout } = useAdmin()
@@ -177,10 +178,32 @@ function Field({ label, id, type, autoComplete, value, onChange }) {
 
 function AdminPanel() {
   const [showChangePassword, setShowChangePassword] = useState(false)
+  const [tab, setTab] = useState('gallery') // 'gallery' | 'site-images'
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setTab('gallery')}
+            className={`rounded-sm px-4 py-2 text-sm font-semibold transition-colors ${
+              tab === 'gallery' ? 'bg-navy-900 text-white' : 'bg-white text-navy-700 border border-metal-300'
+            }`}
+          >
+            Gallery Photos
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('site-images')}
+            className={`rounded-sm px-4 py-2 text-sm font-semibold transition-colors ${
+              tab === 'site-images' ? 'bg-navy-900 text-white' : 'bg-white text-navy-700 border border-metal-300'
+            }`}
+          >
+            Site Images
+          </button>
+        </div>
+
         <button
           type="button"
           onClick={() => setShowChangePassword((v) => !v)}
@@ -192,7 +215,7 @@ function AdminPanel() {
 
       {showChangePassword && <ChangePasswordForm onDone={() => setShowChangePassword(false)} />}
 
-      <ManagePhotos />
+      {tab === 'gallery' ? <ManagePhotos /> : <ManageSiteImages />}
     </div>
   )
 }
@@ -438,6 +461,94 @@ function ManagePhotos() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Site images: Home / About / Services / Contact photos (fixed slots)
+// ---------------------------------------------------------------------------
+
+function ManageSiteImages() {
+  const images = useSiteImages()
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 text-navy-900">
+        <ImageIcon size={20} />
+        <h2 className="font-display text-xl font-bold">Home / About / Services / Contact Photos</h2>
+      </div>
+      <p className="mt-2 max-w-2xl text-sm text-navy-600">
+        Each photo below appears on a specific page. Upload a replacement from your
+        computer, or reset it to remove your upload and go back to the placeholder image.
+      </p>
+
+      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {SITE_IMAGE_SLOTS.map((slot) => (
+          <SiteImageCard key={slot.key} slot={slot} currentSrc={images[slot.key]} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SiteImageCard({ slot, currentSrc }) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setError('')
+    setBusy(true)
+    try {
+      const src = await fileToCompressedDataURL(file)
+      await setSiteImage(slot.key, src)
+    } catch (err) {
+      setError(err.message || 'Upload failed. Please try again.')
+    } finally {
+      setBusy(false)
+      e.target.value = '' // allow picking the same file again later
+    }
+  }
+
+  const handleReset = async () => {
+    setError('')
+    setBusy(true)
+    try {
+      await resetSiteImage(slot.key)
+    } catch (err) {
+      setError(err.message || 'Reset failed. Please try again.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="overflow-hidden rounded-sm bg-white shadow-panel">
+      <img src={currentSrc} alt={slot.label} className="h-40 w-full object-cover" />
+      <div className="p-4">
+        <p className="text-xs font-semibold text-navy-800">{slot.label}</p>
+
+        {error && <p className="mt-2 text-xs font-medium text-forge-600">{error}</p>}
+
+        <div className="mt-3 flex items-center gap-2">
+          <label className="inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-sm border border-navy-900/30 px-3 py-2 text-xs font-semibold text-navy-900 transition-colors hover:bg-navy-900 hover:text-white">
+            <Upload size={14} />
+            {busy ? 'Working…' : 'Replace'}
+            <input type="file" accept="image/*" onChange={handleFile} disabled={busy} className="hidden" />
+          </label>
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={busy}
+            title="Reset to default placeholder"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-sm border border-metal-300 text-navy-600 transition-colors hover:border-forge-400 hover:text-forge-600 disabled:opacity-60"
+          >
+            <RotateCcw size={14} />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

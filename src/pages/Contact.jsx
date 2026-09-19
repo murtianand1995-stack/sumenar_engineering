@@ -1,9 +1,15 @@
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Clock, CheckCircle2 } from 'lucide-react'
+import emailjs from '@emailjs/browser'
+import { Mail, Phone, MapPin, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
 import SEO from '../components/SEO'
 import { COMPANY } from '../data/siteData'
+import { useSiteImages } from '../data/siteImages'
 
 const initialForm = { name: '', email: '', phone: '', company: '', message: '' }
+
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
 function validate(form) {
   const errors = {}
@@ -23,20 +29,47 @@ function validate(form) {
 }
 
 export default function Contact() {
+  const siteImages = useSiteImages()
   const [form, setForm] = useState(initialForm)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
+  const [sendError, setSendError] = useState('')
+  const [sending, setSending] = useState(false)
 
   const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setSendError('')
     const foundErrors = validate(form)
     setErrors(foundErrors)
-    if (Object.keys(foundErrors).length === 0) {
-      // No backend is wired up yet — this simulates a successful submission.
+    if (Object.keys(foundErrors).length > 0) return
+
+    setSending(true)
+    try {
+      // 1) Email — sent for real via EmailJS, lands directly in the inbox.
+      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            from_name: form.name,
+            from_email: form.email,
+            phone: form.phone,
+            company: form.company || '—',
+            message: form.message,
+          },
+          { publicKey: EMAILJS_PUBLIC_KEY }
+        )
+      }
+
       setSubmitted(true)
       setForm(initialForm)
+    } catch (err) {
+      console.error('Enquiry send failed:', err)
+      setSendError('Something went wrong while sending your message. Please try again, or reach us directly by phone or WhatsApp.')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -53,7 +86,7 @@ export default function Contact() {
           <span className="eyebrow">Get In Touch</span>
           <h1 className="mt-3 max-w-2xl text-4xl font-bold sm:text-5xl">Let&rsquo;s talk about your lifting or separation need.</h1>
           <p className="mt-5 max-w-xl text-base text-metal-300">
-            Send us your requirement & our engineering team will get back to you with the
+            Send us your requirement and our engineering team will get back to you with the
             right solution and a quote.
           </p>
         </div>
@@ -109,7 +142,7 @@ export default function Contact() {
 
             <div className="mt-8 overflow-hidden rounded-sm shadow-panel">
               <img
-                src="https://picsum.photos/seed/sumenar-contact-facility/700/420"
+                src={siteImages['contact-facility']}
                 alt="Sumenar Engineering facility exterior"
                 className="h-52 w-full object-cover"
                 loading="lazy"
@@ -123,9 +156,18 @@ export default function Contact() {
               <div className="mb-6 flex items-start gap-3 rounded-sm border border-steel-400 bg-white p-4">
                 <CheckCircle2 size={20} className="mt-0.5 shrink-0 text-forge-500" />
                 <div>
-                  <p className="text-sm font-semibold text-navy-900">Thanks — your message has been sent.</p>
-                  <p className="mt-0.5 text-sm text-navy-700/80">Our team will get back to you shortly.</p>
+                  <p className="text-sm font-semibold text-navy-900">Message has been sent successfully.</p>
+                  <p className="mt-0.5 text-sm text-navy-700/80">
+                    Thank you for reaching out — our team will get back to you shortly.
+                  </p>
                 </div>
+              </div>
+            )}
+
+            {sendError && (
+              <div className="mb-6 flex items-start gap-3 rounded-sm border border-forge-400 bg-white p-4">
+                <AlertCircle size={20} className="mt-0.5 shrink-0 text-forge-500" />
+                <p className="text-sm text-navy-800">{sendError}</p>
               </div>
             )}
 
@@ -176,8 +218,8 @@ export default function Contact() {
                 />
               </Field>
 
-              <button type="submit" className="btn-primary sm:col-span-2 w-fit">
-                Submit Enquiry
+              <button type="submit" disabled={sending} className="btn-primary sm:col-span-2 w-fit disabled:opacity-60">
+                {sending ? 'Sending…' : 'Submit Enquiry'}
               </button>
             </form>
           </div>

@@ -3,6 +3,7 @@ import { ShieldCheck, Zap, HardHat, Cog, ArrowUpRight, CheckCircle2 } from 'luci
 import SEO from '../components/SEO'
 import { PRODUCTS, WHY_CHOOSE_US } from '../data/catalog'
 import { COMPANY } from '../data/siteData'
+import { useSiteImages } from '../data/siteImages'
 
 const FEATURES = [
   { icon: ShieldCheck, title: 'Safe & Reliable Lifting', desc: 'Dual safety margins and tested holding force on every unit we build.' },
@@ -12,6 +13,7 @@ const FEATURES = [
 ]
 
 export default function Home() {
+  const siteImages = useSiteImages()
   return (
     <>
       <SEO
@@ -62,7 +64,7 @@ export default function Home() {
           <div className="relative">
             <div className="diagonal-cut overflow-hidden rounded-sm shadow-panel">
               <img
-                src="https://picsum.photos/seed/sumenar-hero-main/900/1000"
+                src={siteImages['home-hero']}
                 alt="Heavy-duty magnetic lifter handling a steel plate in an industrial facility"
                 className="h-[22rem] w-full object-cover sm:h-[28rem] lg:h-[34rem]"
                 loading="eager"
@@ -103,8 +105,8 @@ export default function Home() {
             </NavLink>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <img src="https://picsum.photos/seed/sumenar-intro-1/500/620" alt="Fabrication of magnetic lifting equipment" className="h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
-            <img src="https://picsum.photos/seed/sumenar-intro-2/500/620" alt="Assembly of an industrial magnetic separator" className="mt-8 h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
+            <img src={siteImages['home-intro-1']} alt="Fabrication of magnetic lifting equipment" className="h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
+            <img src={siteImages['home-intro-2']} alt="Assembly of an industrial magnetic separator" className="mt-8 h-full w-full rounded-sm object-cover shadow-panel" loading="lazy" />
           </div>
         </div>
       </section>
@@ -127,7 +129,7 @@ export default function Home() {
               <article key={p.id} className="group overflow-hidden rounded-sm bg-white shadow-panel">
                 <div className="overflow-hidden">
                   <img
-                    src={p.image}
+                    src={siteImages[`product-${p.id}`] || p.image}
                     alt={p.name}
                     className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"

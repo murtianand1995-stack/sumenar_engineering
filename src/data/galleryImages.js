@@ -24,6 +24,11 @@ import {
   getDocs,
   Timestamp,
 } from 'firebase/firestore'
+import { fileToCompressedDataURL } from '../utils/imageCompress'
+
+// Re-exported so existing imports of fileToCompressedDataURL from this file
+// keep working unchanged.
+export { fileToCompressedDataURL }
 
 export const db = getFirestore(app)
 const COLLECTION_NAME = 'galleryImages'
@@ -41,10 +46,7 @@ export const GALLERY_CATEGORIES = [
 export const DEFAULT_GALLERY_IMAGES = []
 
 // Firestore caps a single document around 1 MB. Base64 text is ~33% bigger
-// than the original binary, so we compress fairly aggressively and leave
-// headroom below that cap.
-const MAX_DIMENSION = 1200
-const JPEG_QUALITY = 0.75
+// than the original binary, so we leave headroom below that cap.
 const MAX_DATA_URL_BYTES = 900 * 1024
 
 // --- read (one-time fetch, rarely needed since subscribeGallery covers live use) ---
@@ -89,39 +91,3 @@ export async function deleteGalleryImage(id) {
   await deleteDoc(doc(db, COLLECTION_NAME, id))
 }
 
-/**
- * Read a File picked from the local system and return a compressed data URL.
- * Downscaling keeps each Firestore document comfortably under its size cap.
- */
-export function fileToCompressedDataURL(file) {
-  return new Promise((resolve, reject) => {
-    if (!file || !file.type.startsWith('image/')) {
-      reject(new Error('Please choose an image file.'))
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onerror = () => reject(new Error('Could not read that file.'))
-    reader.onload = () => {
-      const img = new Image()
-      img.onerror = () => reject(new Error('That image could not be opened.'))
-      img.onload = () => {
-        const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height))
-        const canvas = document.createElement('canvas')
-        canvas.width = Math.round(img.width * scale)
-        canvas.height = Math.round(img.height * scale)
-
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-
-        try {
-          resolve(canvas.toDataURL('image/jpeg', JPEG_QUALITY))
-        } catch {
-          resolve(reader.result) // fall back to the original data URL
-        }
-      }
-      img.src = reader.result
-    }
-    reader.readAsDataURL(file)
-  })
-}

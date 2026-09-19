@@ -2,8 +2,10 @@ import { NavLink } from 'react-router-dom'
 import * as Icons from 'lucide-react'
 import SEO from '../components/SEO'
 import { SERVICES, PRODUCTS } from '../data/catalog'
+import { useSiteImages } from '../data/siteImages'
 
 export default function Services() {
+  const siteImages = useSiteImages()
   return (
     <>
       <SEO
@@ -58,7 +60,7 @@ export default function Services() {
                 className="grid gap-8 overflow-hidden rounded-sm bg-white shadow-panel lg:grid-cols-2"
               >
                 <img
-                  src={p.image}
+                  src={siteImages[`product-${p.id}`] || p.image}
                   alt={p.name}
                   className={`h-72 w-full object-cover lg:h-full ${i % 2 === 1 ? 'lg:order-2' : 'lg:order-1'}`}
                   loading="lazy"
