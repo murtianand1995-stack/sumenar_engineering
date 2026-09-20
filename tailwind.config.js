@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+ /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
@@ -33,8 +33,13 @@ export default {
         display: ['"Barlow Condensed"', 'sans-serif'],
         body: ['"Inter"', 'sans-serif'],
       },
+      borderRadius: {
+        sm: '0.75rem',  // buttons, form panels, generic cards — was a near-square 2px
+        lg: '1.25rem',  // photos, hero images, product panels — soft & premium
+      },
       boxShadow: {
-        panel: '0 20px 60px -20px rgba(6, 13, 25, 0.45)',
+        panel: '0 14px 34px -16px rgba(6, 13, 25, 0.18)',
+        image: '0 10px 26px -14px rgba(6, 13, 25, 0.14)',
       },
       backgroundImage: {
         'field-lines': "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.06' stroke-width='1'%3E%3Cpath d='M0 20 Q60 0 120 20'/%3E%3Cpath d='M0 50 Q60 30 120 50'/%3E%3Cpath d='M0 80 Q60 60 120 80'/%3E%3Cpath d='M0 110 Q60 90 120 110'/%3E%3C/g%3E%3C/svg%3E\")",

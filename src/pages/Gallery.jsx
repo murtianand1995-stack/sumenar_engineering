@@ -98,11 +98,11 @@ export default function Gallery() {
               <p className="text-sm">No photos have been added to the gallery yet.</p>
             </div>
           ) : (
-            <div className="mt-10 columns-1 gap-5 sm:columns-2 lg:columns-3 [&>*]:mb-5">
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredImages.map((img, idx) => (
                 <figure
                   key={img.id}
-                  className="group relative break-inside-avoid overflow-hidden rounded-sm bg-white shadow-panel"
+                  className="group relative overflow-hidden rounded-lg bg-white shadow-image ring-1 ring-navy-900/[0.06]"
                 >
                   <button
                     type="button"
@@ -114,7 +114,7 @@ export default function Gallery() {
                       src={img.src}
                       alt={img.caption}
                       loading={idx < 3 ? 'eager' : 'lazy'}
-                      className="w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                     />
                   </button>
 

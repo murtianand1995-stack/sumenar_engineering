@@ -71,7 +71,7 @@ export default function Navbar() {
 
         <div className="hidden lg:block">
           <NavLink to="/contact" className="btn-primary">
-            Get a Quote
+            Let’s Connect
           </NavLink>
         </div>
 

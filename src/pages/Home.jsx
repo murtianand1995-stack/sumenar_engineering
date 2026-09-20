@@ -41,7 +41,7 @@ export default function Home() {
                 Explore Products
               </NavLink>
               <NavLink to="/contact" className="btn-secondary">
-                Get a Quote
+               Let’s Work Together
               </NavLink>
             </div>
 
@@ -204,7 +204,7 @@ export default function Home() {
             <p className="mt-2 text-sm text-white/90">Talk to our engineering team about your application.</p>
           </div>
           <NavLink to="/contact" className="inline-flex items-center justify-center gap-2 rounded-sm bg-navy-900 px-7 py-3.5 text-sm font-semibold text-white shadow-panel transition-colors hover:bg-navy-800">
-            Get a Quote
+            Let’s Work Together
           </NavLink>
         </div>
       </section>
