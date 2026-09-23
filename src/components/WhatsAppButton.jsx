@@ -2,7 +2,7 @@
 // WhatsApp chat with a friendly default message. This is completely
 // separate from the Contact form — the form only sends an email.
 
-const WHATSAPP_NUMBER = '917070100897'
+const WHATSAPP_NUMBER = '917479511663'
 const DEFAULT_MESSAGE = "Hi, I'm interested in Sumenar Engineering's products. Could you share more details?"
 
 export default function WhatsAppButton() {
