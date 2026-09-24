@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Youtube, Magnet, Lock, LogOut } from 'lucide-react'
 import { COMPANY, NAV_LINKS, SOCIALS } from '../data/siteData'
@@ -7,21 +6,7 @@ import { useAdmin } from '../context/AdminContext'
 const SOCIAL_ICON = { facebook: Facebook, instagram: Instagram, linkedin: Linkedin, youtube: Youtube }
 
 export default function Footer() {
-  const { isAdmin, login, logout } = useAdmin()
-  const [showLogin, setShowLogin] = useState(false)
-  const [passcode, setPasscode] = useState('')
-  const [error, setError] = useState('')
-
-  const submitLogin = (e) => {
-    e.preventDefault()
-    if (login(passcode)) {
-      setShowLogin(false)
-      setPasscode('')
-      setError('')
-    } else {
-      setError('Incorrect passcode.')
-    }
-  }
+  const { isAdmin, logout } = useAdmin()
 
   return (
     <footer className="bg-navy-950 text-metal-300">
@@ -63,7 +48,7 @@ export default function Footer() {
           <ul className="mt-4 space-y-3 text-sm">
             <li className="flex items-start gap-2.5">
               <Mail size={16} className="mt-0.5 shrink-0 text-forge-400" />
-              <a href={`mailto:${COMPANY.email}`} className="transition-colors hover:text-white break-all">
+              <a href={`mailto:${COMPANY.email}`} className="text-xs transition-colors hover:text-white sm:text-[13px]">
                 {COMPANY.email}
               </a>
             </li>
@@ -99,9 +84,9 @@ export default function Footer() {
               )
             })}
           </div>
-          {/* <NavLink to="/contact" className="btn-secondary mt-6 w-fit">
+          <NavLink to="/contact" className="btn-secondary mt-6 w-fit">
             Get a Quote
-          </NavLink> */}
+          </NavLink>
         </div>
       </div>
 
@@ -119,39 +104,16 @@ export default function Footer() {
                 <LogOut size={13} /> Admin logout
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => setShowLogin((v) => !v)}
+              <NavLink
+                to="/admin"
                 aria-label="Admin access"
                 className="grid h-6 w-6 place-items-center text-metal-600 transition-colors hover:text-metal-400"
               >
                 <Lock size={13} />
-              </button>
+              </NavLink>
             )}
           </div>
         </div>
-
-        {showLogin && !isAdmin && (
-          <div className="border-t border-white/10 bg-navy-900">
-            <form onSubmit={submitLogin} className="container-x flex flex-wrap items-center gap-3 py-4">
-              <label htmlFor="admin-pass" className="text-xs text-metal-400">
-                Admin passcode
-              </label>
-              <input
-                id="admin-pass"
-                type="password"
-                value={passcode}
-                onChange={(e) => setPasscode(e.target.value)}
-                className="rounded-sm border border-white/15 bg-navy-800 px-3 py-1.5 text-sm text-white outline-none focus:border-forge-500"
-                placeholder="Enter passcode"
-              />
-              <button type="submit" className="rounded-sm bg-forge-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-forge-600">
-                Unlock
-              </button>
-              {error && <span className="text-xs text-forge-400">{error}</span>}
-            </form>
-          </div>
-        )}
       </div>
     </footer>
   )

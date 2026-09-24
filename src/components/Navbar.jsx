@@ -107,13 +107,13 @@ export default function Navbar() {
               {link.label}
             </NavLink>
           ))}
-          <NavLink
+          {/* <NavLink
             to="/contact"
             onClick={() => setOpen(false)}
             className="btn-primary mt-2 w-full"
           >
             Get a Quote
-          </NavLink>
+          </NavLink> */}
         </nav>
       </div>
     </header>
