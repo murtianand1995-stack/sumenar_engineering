@@ -84,9 +84,9 @@ export default function Footer() {
               )
             })}
           </div>
-          <NavLink to="/contact" className="btn-secondary mt-6 w-fit">
+          {/* <NavLink to="/contact" className="btn-secondary mt-6 w-fit">
             Get a Quote
-          </NavLink>
+          </NavLink> */}
         </div>
       </div>
 
