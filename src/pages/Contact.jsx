@@ -128,7 +128,14 @@ export default function Contact() {
                 </span>
                 <div>
                   <p className="text-xs font-semibold text-navy-500">Address</p>
-                  <p className="text-sm font-medium text-navy-900">{COMPANY.address}</p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-navy-900 hover:text-forge-500"
+                  >
+                    {COMPANY.address}
+                  </a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -142,7 +149,7 @@ export default function Contact() {
               </li>
             </ul>
 
-            <div className="mt-8 overflow-hidden rounded-sm shadow-panel">
+            <div className="mt-8 overflow-hidden rounded-lg shadow-image">
               <img
                 src={siteImages['contact-facility']}
                 alt="Sumenar Engineering facility exterior"

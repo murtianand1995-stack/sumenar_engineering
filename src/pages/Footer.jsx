@@ -91,15 +91,15 @@ export default function Footer() {
               )
             })}
           </div>
-          {/* <NavLink to="/contact" className="btn-secondary mt-6 w-fit">
+          <NavLink to="/contact" className="btn-secondary mt-6 w-fit">
             Get a Quote
-          </NavLink> */}
+          </NavLink>
         </div>
       </div>
 
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-metal-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} {COMPANY.name}. All rights reserved. GSTIN: 27BRSPM0256N2Z3</p>
+          <p>© {new Date().getFullYear()} {COMPANY.name}. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <p>{COMPANY.tagline}</p>
             {isAdmin ? (
